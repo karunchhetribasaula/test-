@@ -1,164 +1,139 @@
-<?php
-session_start();
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Business</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header, section { padding: 60px 20px; }
+    header { background: #0057b7; color: white; text-align: center; }
+    nav { background: #003f87; padding: 10px 20px; }
+    nav a { color: white; margin-right: 15px; text-decoration: none; }
+    nav a:hover { text-decoration: underline; }
 
-// Configuration
-$to_email = "chhetrikarun6@gmail.com"; // Your email address
-$subject = "New Contact Form Submission - My Business";
+    .container { max-width: 900px; margin: auto; }
+    h2 { color: #0057b7; margin-bottom: 10px; }
 
-// Initialize variables
-$errors = [];
-$success = false;
+    form input, form textarea, form select {
+        width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-// Check if form was submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // Sanitize and validate input
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $phone = trim($_POST['phone'] ?? '');
-    $service = trim($_POST['service'] ?? '');
-    $message = trim($_POST['message'] ?? '');
-    
-    // Validation
-    if (empty($name)) {
-        $errors[] = "Name is required.";
+    form button {
+        padding: 10px 20px; background: #0057b7; color: white; border: none;
+        border-radius: 5px; cursor: pointer;
     }
-    
-    if (empty($email)) {
-        $errors[] = "Email is required.";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Please enter a valid email address.";
-    }
-    
-    if (empty($message)) {
-        $errors[] = "Message is required.";
-    }
-    
-    // If no errors, proceed with sending email
-    if (empty($errors)) {
-        
-        // Service options mapping
-        $service_options = [
-            'web-development' => '🌐 Web Development',
-            'marketing' => '📈 Digital Marketing',
-            'consulting' => '💼 Business Consulting',
-            'other' => '🔧 Other'
-        ];
-        
-        $selected_service = $service_options[$service] ?? 'Not specified';
-        
-        // Email content
-        $email_content = "
-        <html>
-        <head>
-            <style>
-                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: #0057b7; color: white; padding: 20px; text-align: center; }
-                .content { background: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
-                .field { margin-bottom: 15px; }
-                .label { font-weight: bold; color: #0057b7; }
-                .value { margin-left: 10px; }
-                .footer { text-align: center; margin-top: 20px; color: #666; font-size: 12px; }
-            </style>
-        </head>
-        <body>
-            <div class='container'>
-                <div class='header'>
-                    <h2>New Contact Form Submission</h2>
-                </div>
-                <div class='content'>
-                    <div class='field'>
-                        <span class='label'>Name:</span>
-                        <span class='value'>" . htmlspecialchars($name) . "</span>
-                    </div>
-                    <div class='field'>
-                        <span class='label'>Email:</span>
-                        <span class='value'>" . htmlspecialchars($email) . "</span>
-                    </div>
-                    <div class='field'>
-                        <span class='label'>Phone:</span>
-                        <span class='value'>" . htmlspecialchars($phone ?: 'Not provided') . "</span>
-                    </div>
-                    <div class='field'>
-                        <span class='label'>Service Interest:</span>
-                        <span class='value'>" . htmlspecialchars($selected_service) . "</span>
-                    </div>
-                    <div class='field'>
-                        <span class='label'>Message:</span>
-                        <div style='margin-top: 10px; padding: 10px; background: white; border: 1px solid #ddd; border-radius: 5px;'>
-                            " . nl2br(htmlspecialchars($message)) . "
-                        </div>
-                    </div>
-                </div>
-                <div class='footer'>
-                    <p>This email was sent from your business website contact form.</p>
-                    <p>Submitted on: " . date('Y-m-d H:i:s') . "</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        ";
-        
-        // Email headers
-        $headers = [
-            'MIME-Version: 1.0',
-            'Content-type: text/html; charset=UTF-8',
-            'From: ' . $email,
-            'Reply-To: ' . $email,
-            'Return-Path: ' . $email,
-            'X-Mailer: PHP/' . phpversion()
-        ];
-        
-        // Attempt to send email
-        $mail_sent = mail($to_email, $subject, $email_content, implode("\r\n", $headers));
-        
-        if ($mail_sent) {
-            $_SESSION['success_message'] = "Thank you for your message! We'll get back to you soon.";
-            $success = true;
-            
-            // Optional: Save to database (uncomment if you want to store submissions)
-            // saveToDatabase($name, $email, $phone, $service, $message);
-            
-        } else {
-            $errors[] = "Sorry, there was an error sending your message. Please try again or contact us directly.";
-        }
-    }
-    
-    // Store errors in session
-    if (!empty($errors)) {
-        $_SESSION['form_errors'] = $errors;
-    }
-    
-    // Redirect back to the main page
-    header("Location: index.php#contact");
-    exit;
-} else {
-    // If someone tries to access this file directly
-    header("Location: index.php");
-    exit;
-}
 
-// Optional: Database storage function
-function saveToDatabase($name, $email, $phone, $service, $message) {
-    // Database configuration
-    $host = 'localhost';
-    $dbname = 'your_database_name';
-    $username = 'your_db_username';
-    $password = 'your_db_password';
-    
-    try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
-        $sql = "INSERT INTO contact_submissions (name, email, phone, service, message, submitted_at) 
-                VALUES (?, ?, ?, ?, ?, NOW())";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([$name, $email, $phone, $service, $message]);
-        
-    } catch (PDOException $e) {
-        // Log error (don't show to user)
-        error_log("Database error: " . $e->getMessage());
+    .success, .error {
+        padding: 10px; margin-bottom: 15px;
+        border-left: 4px solid; display: none;
     }
-}
-?>
+
+    .success { background: #d4edda; color: #155724; border-color: #28a745; }
+    .error { background: #f8d7da; color: #721c24; border-color: #dc3545; }
+
+    footer { text-align: center; padding: 20px; background: #f0f0f0; }
+  </style>
+</head>
+<body>
+
+<nav class="container">
+  <a href="#home">Home</a>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<header id="home">
+  <div class="container">
+    <h1>Welcome to My Business</h1>
+    <p>We help you grow online. Affordable. Reliable. Fast.</p>
+  </div>
+</header>
+
+<section id="about">
+  <div class="container">
+    <h2>About Us</h2>
+    <p>We are a modern digital solutions company focused on web development, online marketing, and business consulting.</p>
+  </div>
+</section>
+
+<section id="services" style="background:#f9f9f9;">
+  <div class="container">
+    <h2>Our Services</h2>
+    <ul>
+      <li>🌐 Web Development</li>
+      <li>📈 Digital Marketing</li>
+      <li>💼 Business Consulting</li>
+      <li>🔧 Custom Software</li>
+    </ul>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="container">
+    <h2>Contact Us</h2>
+
+    <!-- Success/Error messages will show here -->
+    <div class="success" id="formSuccess">Your message has been sent successfully.</div>
+    <div class="error" id="formError">There was an error sending your message.</div>
+
+    <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+      <!-- Your Web3Forms Access Key -->
+      <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_SECRET_KEY_HERE" />
+
+      <!-- Optional: Redirect URL after submission -->
+      <!-- <input type="hidden" name="redirect" value="thankyou.html"> -->
+
+      <!-- Optional: From name/email -->
+      <input type="hidden" name="from_name" value="My Business Website" />
+      <input type="hidden" name="subject" value="New Contact Form Submission" />
+
+      <input type="text" name="name" placeholder="Your Name" required>
+      <input type="email" name="email" placeholder="Your Email" required>
+      <input type="text" name="phone" placeholder="Phone Number (optional)">
+      <select name="service">
+        <option value="">Select Service</option>
+        <option value="web-development">Web Development</option>
+        <option value="marketing">Digital Marketing</option>
+        <option value="consulting">Business Consulting</option>
+        <option value="other">Other</option>
+      </select>
+      <textarea name="message" placeholder="Your Message" rows="5" required></textarea>
+      <button type="submit">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <p>© <?= date('Y') ?> My Business. All rights reserved.</p>
+</footer>
+
+<!-- Web3Forms JS (for optional response messages) -->
+<script>
+  const form = document.getElementById("contactForm");
+  const successMessage = document.getElementById("formSuccess");
+  const errorMessage = document.getElementById("formError");
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const formData = new FormData(form);
+    const res = await fetch(form.action, {
+      method: "POST",
+      body: formData
+    });
+
+    if (res.ok) {
+      successMessage.style.display = "block";
+      errorMessage.style.display = "none";
+      form.reset();
+    } else {
+      successMessage.style.display = "none";
+      errorMessage.style.display = "block";
+    }
+  });
+</script>
+
+</body>
+</html>
