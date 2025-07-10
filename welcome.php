@@ -81,7 +81,7 @@
 
     <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
       <!-- Your Web3Forms Access Key -->
-      <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_SECRET_KEY_HERE" />
+      <input type="hidden" name="access_key" value="50dd8243-5587-483d-bc91-2f800c9fa505" />
 
       <!-- Optional: Redirect URL after submission -->
       <!-- <input type="hidden" name="redirect" value="thankyou.html"> -->

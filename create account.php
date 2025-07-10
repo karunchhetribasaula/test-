@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <title>Sign Up</title>
+    <title>Create Account</title>
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -88,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Password</label>
             <input type="password" name="password" required minlength="6">
 
-            <input type="submit" value="Sign Up">
+            <input type="submit" value="Create Account">
         </form>
 
         <p>Already have an account? <a href="login.php">Login Here</a></p>
